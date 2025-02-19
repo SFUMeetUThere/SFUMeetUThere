@@ -1,8 +1,29 @@
 import { Box } from "@mui/material";
-import { MapContainer, TileLayer, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, useMapEvents } from "react-leaflet";
+import { useState } from "react";
 import CustomMarker from "./CustomMarker";
+import { LeafletMouseEvent } from "leaflet";
 
 export const LeafletMap = () => {
+  // TODO: will add the marker according to the locations that match our radius and category
+  const AddLocationMarker = () => {
+    const [position, setPosition] = useState<
+      LeafletMouseEvent["latlng"] | null
+    >(null);
+    const map = useMapEvents({
+      click(e: LeafletMouseEvent) {
+        setPosition(e.latlng);
+        map.flyTo(e.latlng, map.getZoom());
+      },
+    });
+
+    return position === null ? null : (
+      <CustomMarker position={position}>
+        <Popup>Popup</Popup>
+      </CustomMarker>
+    );
+  };
+
   return (
     <Box flex={1}>
       <MapContainer
@@ -18,6 +39,7 @@ export const LeafletMap = () => {
         <CustomMarker position={[49.276765, -122.917957]}>
           <Popup>Popup</Popup>
         </CustomMarker>
+        <AddLocationMarker />
       </MapContainer>
     </Box>
   );
